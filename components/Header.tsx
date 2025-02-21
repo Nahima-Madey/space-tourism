@@ -1,3 +1,4 @@
+// components/Header.tsx
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -8,6 +9,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -34,11 +36,7 @@ const Header = () => {
 
   return (
     <header className="relative w-full text-white py-8 md:py-0">
-      {/* Background only on the right half */}
-      <div className="absolute top-0 right-0 w-3/5 h-full bg-[#0B0D17]"></div>
-
-      {/* Content wrapper */}
-      <div className="relative flex items-center justify-end">
+      <div className="flex items-center justify-end">
         {/* Mobile menu button */}
         {isMobile && (
           <button 
@@ -60,7 +58,7 @@ const Header = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:block">
-          <div className="h-24 lg:h-28 pl-2 pr-0">
+          <div className={`${isHomePage ? 'bg-[#0B0D17]/70' : 'bg-[#0B0D17]/90'} backdrop-blur-md h-24 lg:h-28 pl-2 pr-0`}>
             <ul className="flex h-full items-center">
               {navItems.map((item) => (
                 <li key={item.id} className="relative h-full flex items-center">
