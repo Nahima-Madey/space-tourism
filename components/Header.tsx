@@ -1,75 +1,105 @@
-// components/Header.jsx
-
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-export default function Header() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const navItems = [
-    { id: "00", label: "HOME", href: "/" },
-    { id: "01", label: "DESTINATION", href: "/destination" },
-    { id: "02", label: "CREW", href: "/crew" },
-    { id: "03", label: "TECHNOLOGY", href: "/technology" },
+    { id: '00', title: 'HOME', path: '/' },
+    { id: '01', title: 'DESTINATION', path: '/destination' },
+    { id: '02', title: 'CREW', path: '/crew' },
+    { id: '03', title: 'TECHNOLOGY', path: '/technology' },
   ];
 
-  return (
-    <header className="bg-[#0c0d18] text-white h-[40px] flex justify-center items-center">
-      <div className="bg-[#1c1d29] h-full px-24 flex items-center justify-center">
-        <nav className="flex space-x-12 h-full">
-          {navItems.map((item, index) => (
-            <Link 
-              key={item.id} 
-              href={item.href}
-              className="relative h-full flex items-center"
-              onClick={() => setActiveIndex(index)}
-            >
-              <div className="flex items-center text-[13px] tracking-[2px] py-2 px-1">
-                <span className="font-mono mr-2">{item.id}</span>
-                <span className="font-mono">{item.label}</span>
-              </div>
-              {index === 0 && (
-                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white"></div>
-              )}
-            </Link>
-          ))}
-        </nav>
-      </div>
+  const isActive = (path: string) => pathname === path;
 
-      {/* Mobile Navigation - Hidden by default but will appear on small screens */}
-      <div className="lg:hidden">
-        <button onClick={toggleMenu} className="text-white p-2">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        
-        {isOpen && (
-          <div className="absolute top-[40px] right-0 w-48 bg-[#1c1d29] shadow-md z-50">
-            {navItems.map((item, index) => (
-              <Link 
-                key={item.id} 
-                href={item.href}
-                className="block px-4 py-2 text-[13px] tracking-[2px]"
-                onClick={() => {
-                  setActiveIndex(index);
-                  setIsOpen(false);
-                }}
-              >
-                <span className="font-mono mr-2">{item.id}</span>
-                <span className="font-mono">{item.label}</span>
-              </Link>
-            ))}
-          </div>
+  return (
+    <header className="relative w-full text-white py-8 md:py-0">
+      {/* Background only on the right half */}
+      <div className="absolute top-0 right-0 w-3/5 h-full bg-[#0B0D17]"></div>
+
+      {/* Content wrapper */}
+      <div className="relative flex items-center justify-end">
+        {/* Mobile menu button */}
+        {isMobile && (
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="absolute right-6 z-50 focus:outline-none"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 6H20M4 12H20M4 18H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </button>
         )}
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:block">
+          <div className="h-24 lg:h-28 pl-2 pr-0">
+            <ul className="flex h-full items-center">
+              {navItems.map((item) => (
+                <li key={item.id} className="relative h-full flex items-center">
+                  <Link href={item.path}>
+                    <span className={`flex items-center h-full text-xs lg:text-sm tracking-widest hover:text-white group transition duration-200 px-3 lg:px-4 ${isActive(item.path) ? 'text-white' : 'text-gray-300'}`}>
+                      <span className="font-bold mr-2">{item.id}</span>
+                      <span>{item.title}</span>
+                      <span className={`absolute bottom-0 left-0 w-full h-1 bg-white transform ${isActive(item.path) ? 'opacity-100' : 'opacity-0 group-hover:opacity-75'} transition-opacity duration-200`}></span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+        
+        {/* Mobile Navigation Menu */}
+        <div className={`md:hidden fixed inset-y-0 right-0 transition-transform transform duration-300 ease-in-out z-40 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="w-64 h-full bg-[#0B0D17]/95 backdrop-blur-md flex flex-col pt-24 px-8">
+            <ul className="space-y-8">
+              {navItems.map((item) => (
+                <li key={item.id}>
+                  <Link href={item.path}>
+                    <span 
+                      className={`block text-sm tracking-widest py-2 border-b border-transparent ${isActive(item.path) ? 'text-white border-white' : 'text-gray-300 hover:border-gray-400'}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span className="font-bold mr-2">{item.id}</span>
+                      <span>{item.title}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </header>
   );
-}
+};
+
+export default Header;
