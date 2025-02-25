@@ -1,4 +1,3 @@
-// app/layout.tsx
 import './globals.css';
 import { Inter } from 'next/font/google';
 import Header from '../components/Header';
@@ -22,7 +21,6 @@ export default function RootLayout({
           <Header />
         </div>
         
-        {/* Main content */}
         <div className="flex-grow relative z-20 overflow-y-auto">
           {children}
         </div>
