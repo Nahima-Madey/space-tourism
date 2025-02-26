@@ -1,4 +1,3 @@
-// components/Header.tsx
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -35,7 +34,7 @@ const Header = () => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <header className="fixed top-0 left-0 w-full text-white py-8 md:py-0 z-30">
+    <header className="relative w-full text-white py-8 md:py-0">
       <div className="flex items-center justify-end">
         {/* Mobile menu button */}
         {isMobile && (
